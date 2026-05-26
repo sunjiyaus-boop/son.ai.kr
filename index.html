@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SON — Luxury Brand</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Noto+Serif+KR:wght@300;400;500&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gold: #C9A96E;
+      --gold-light: #E8D5A3;
+      --black: #0A0A0A;
+      --dark: #111111;
+      --gray: #1C1C1C;
+      --mid: #333333;
+      --text: #E0D8CC;
+      --muted: #8A8278;
+      --white: #FAF8F5;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--black);
+      color: var(--text);
+      font-family: 'Montserrat', 'Noto Serif KR', serif;
+      font-weight: 300;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 24px 60px;
+      background: linear-gradient(to bottom, rgba(10,10,10,0.95), transparent);
+      transition: background 0.4s;
+    }
+    nav.scrolled { background: rgba(10,10,10,0.97); border-bottom: 1px solid rgba(201,169,110,0.15); }
+    .nav-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 28px; font-weight: 300; letter-spacing: 8px;
+      color: var(--gold); text-decoration: none;
+    }
+    .nav-links { display: flex; gap: 40px; list-style: none; }
+    .nav-links a {
+      color: var(--text); text-decoration: none;
+      font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+      opacity: 0.75; transition: opacity 0.3s, color 0.3s;
+    }
+    .nav-links a:hover { opacity: 1; color: var(--gold); }
+    .nav-cta {
+      padding: 10px 28px;
+      border: 1px solid var(--gold);
+      color: var(--gold); text-decoration: none;
+      font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+      transition: all 0.3s;
+    }
+    .nav-cta:hover { background: var(--gold); color: var(--black); }
+
+    /* ─── HERO ─── */
+    #hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      padding: 0 40px;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 50%, rgba(201,169,110,0.06) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 20%, rgba(201,169,110,0.04) 0%, transparent 50%),
+        linear-gradient(135deg, #0A0A0A 0%, #111111 50%, #0D0D0D 100%);
+    }
+    .hero-line {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      width: 600px; height: 600px; border-radius: 50%;
+      border: 1px solid rgba(201,169,110,0.08);
+      pointer-events: none;
+    }
+    .hero-line:nth-child(2) { width: 800px; height: 800px; border-color: rgba(201,169,110,0.05); }
+    .hero-line:nth-child(3) { width: 1000px; height: 1000px; border-color: rgba(201,169,110,0.03); }
+    .hero-content { position: relative; z-index: 2; }
+    .hero-eyebrow {
+      font-size: 10px; letter-spacing: 6px; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 32px; opacity: 0.85;
+    }
+    .hero-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(64px, 10vw, 120px);
+      font-weight: 300; letter-spacing: 12px; line-height: 1;
+      color: var(--white); margin-bottom: 8px;
+    }
+    .hero-subtitle {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(20px, 3vw, 32px);
+      font-weight: 300; font-style: italic;
+      color: var(--gold-light); letter-spacing: 4px; margin-bottom: 48px;
+    }
+    .hero-desc {
+      max-width: 480px; margin: 0 auto 56px;
+      font-size: 13px; color: var(--muted); letter-spacing: 1.5px; line-height: 2;
+    }
+    .hero-btns { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      padding: 16px 48px;
+      background: var(--gold); color: var(--black);
+      text-decoration: none; font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
+      font-weight: 500; transition: all 0.3s;
+    }
+    .btn-primary:hover { background: var(--gold-light); }
+    .btn-outline {
+      padding: 16px 48px;
+      border: 1px solid rgba(201,169,110,0.4); color: var(--gold);
+      text-decoration: none; font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
+      transition: all 0.3s;
+    }
+    .btn-outline:hover { border-color: var(--gold); background: rgba(201,169,110,0.05); }
+    .hero-scroll {
+      position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      color: var(--muted); font-size: 9px; letter-spacing: 3px; text-transform: uppercase;
+    }
+    .scroll-line {
+      width: 1px; height: 50px;
+      background: linear-gradient(to bottom, var(--gold), transparent);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+    @keyframes scrollPulse { 0%,100%{opacity:0.3;} 50%{opacity:1;} }
+
+    /* ─── SECTION COMMON ─── */
+    section { padding: 120px 60px; }
+    .section-eyebrow {
+      font-size: 10px; letter-spacing: 5px; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 16px;
+    }
+    .section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(36px, 5vw, 60px);
+      font-weight: 300; letter-spacing: 3px; line-height: 1.2;
+      color: var(--white); margin-bottom: 24px;
+    }
+    .gold-divider {
+      width: 60px; height: 1px;
+      background: linear-gradient(to right, var(--gold), transparent);
+      margin-bottom: 32px;
+    }
+    .section-text {
+      font-size: 14px; color: var(--muted); line-height: 2; letter-spacing: 0.5px;
+    }
+
+    /* ─── BRAND STORY ─── */
+    #story { background: var(--dark); }
+    .story-inner {
+      max-width: 1200px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 100px; align-items: center;
+    }
+    .story-visual {
+      aspect-ratio: 3/4;
+      background: linear-gradient(135deg, var(--gray) 0%, #222 50%, var(--gray) 100%);
+      position: relative; overflow: hidden;
+    }
+    .story-visual::before {
+      content: 'SON';
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 80px; font-weight: 300; letter-spacing: 20px;
+      color: rgba(201,169,110,0.15);
+    }
+    .story-visual::after {
+      content: '';
+      position: absolute; inset: 20px;
+      border: 1px solid rgba(201,169,110,0.2);
+    }
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; margin-top: 56px; }
+    .stat-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 42px; font-weight: 300; color: var(--gold); letter-spacing: 2px;
+    }
+    .stat-label { font-size: 10px; letter-spacing: 3px; color: var(--muted); text-transform: uppercase; }
+
+    /* ─── COLLECTION ─── */
+    #collection { background: var(--black); }
+    .collection-header { max-width: 600px; margin: 0 auto 80px; text-align: center; }
+    .collection-grid {
+      max-width: 1200px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;
+    }
+    .collection-item {
+      position: relative; aspect-ratio: 3/4; overflow: hidden;
+      cursor: pointer; background: var(--gray);
+    }
+    .collection-item.featured { grid-row: span 2; aspect-ratio: unset; }
+    .item-bg {
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+      transition: transform 0.6s ease;
+    }
+    .collection-item:hover .item-bg { transform: scale(1.05); }
+    .item-label {
+      position: absolute; inset: 0; padding: 32px;
+      display: flex; flex-direction: column; justify-content: flex-end;
+      background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 60%);
+    }
+    .item-tag {
+      font-size: 9px; letter-spacing: 4px; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 8px;
+    }
+    .item-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 24px; font-weight: 300; letter-spacing: 2px; color: var(--white);
+    }
+    .item-price { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    /* ornament icons for items */
+    .item-icon {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      font-size: 64px; opacity: 0.06; pointer-events: none;
+    }
+
+    /* ─── SERVICES ─── */
+    #services { background: var(--dark); }
+    .services-inner { max-width: 1200px; margin: 0 auto; }
+    .services-top { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; margin-bottom: 80px; align-items: end; }
+    .services-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: rgba(201,169,110,0.1); }
+    .service-card {
+      padding: 48px 40px;
+      background: var(--dark);
+      border-bottom: 2px solid transparent;
+      transition: all 0.3s;
+    }
+    .service-card:hover { border-bottom-color: var(--gold); background: rgba(201,169,110,0.03); }
+    .service-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 48px; font-weight: 300; color: rgba(201,169,110,0.2);
+      line-height: 1; margin-bottom: 24px;
+    }
+    .service-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px; font-weight: 400; letter-spacing: 1px;
+      color: var(--white); margin-bottom: 16px;
+    }
+    .service-desc { font-size: 13px; color: var(--muted); line-height: 1.9; }
+
+    /* ─── PORTFOLIO ─── */
+    #portfolio { background: var(--black); }
+    .portfolio-inner { max-width: 1200px; margin: 0 auto; }
+    .portfolio-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 60px; }
+    .portfolio-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 32px; }
+    .portfolio-item {
+      position: relative; padding: 48px;
+      border: 1px solid rgba(201,169,110,0.12);
+      transition: border-color 0.3s;
+    }
+    .portfolio-item:hover { border-color: rgba(201,169,110,0.35); }
+    .portfolio-year {
+      font-size: 11px; color: var(--gold); letter-spacing: 3px; margin-bottom: 16px;
+    }
+    .portfolio-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 26px; font-weight: 300; letter-spacing: 1px;
+      color: var(--white); margin-bottom: 16px;
+    }
+    .portfolio-tags { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px; }
+    .tag {
+      padding: 4px 14px; border: 1px solid rgba(201,169,110,0.25);
+      font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted);
+    }
+
+    /* ─── PRICING ─── */
+    #pricing { background: var(--dark); }
+    .pricing-inner { max-width: 1100px; margin: 0 auto; }
+    .pricing-header { text-align: center; max-width: 560px; margin: 0 auto 80px; }
+    .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; background: rgba(201,169,110,0.08); }
+    .pricing-card {
+      background: var(--dark); padding: 56px 40px;
+      position: relative; transition: background 0.3s;
+    }
+    .pricing-card.featured {
+      background: linear-gradient(135deg, #1a1400, #141000);
+      border-top: 2px solid var(--gold);
+    }
+    .pricing-card.featured::before {
+      content: 'RECOMMENDED';
+      position: absolute; top: -1px; left: 50%; transform: translateX(-50%);
+      background: var(--gold); color: var(--black);
+      font-size: 8px; letter-spacing: 3px; padding: 4px 16px;
+    }
+    .plan-tier {
+      font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 24px;
+    }
+    .plan-price {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 52px; font-weight: 300; color: var(--white);
+      line-height: 1; margin-bottom: 8px;
+    }
+    .plan-price span { font-size: 18px; color: var(--muted); }
+    .plan-desc { font-size: 12px; color: var(--muted); margin-bottom: 40px; }
+    .plan-features { list-style: none; margin-bottom: 48px; }
+    .plan-features li {
+      padding: 12px 0; font-size: 13px; color: var(--text);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      display: flex; gap: 12px; align-items: center;
+    }
+    .plan-features li::before { content: '—'; color: var(--gold); flex-shrink: 0; }
+    .plan-btn {
+      display: block; text-align: center;
+      padding: 14px; border: 1px solid rgba(201,169,110,0.3);
+      color: var(--gold); text-decoration: none;
+      font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+      transition: all 0.3s;
+    }
+    .plan-btn:hover, .pricing-card.featured .plan-btn {
+      background: var(--gold); color: var(--black); border-color: var(--gold);
+    }
+
+    /* ─── CONTACT ─── */
+    #contact { background: var(--black); }
+    .contact-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 100px;
+    }
+    .contact-info { padding-top: 16px; }
+    .contact-detail { margin-bottom: 40px; }
+    .contact-label {
+      font-size: 9px; letter-spacing: 4px; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 8px;
+    }
+    .contact-value { font-size: 14px; color: var(--text); }
+    .form-group { margin-bottom: 28px; }
+    .form-group label {
+      display: block; font-size: 9px; letter-spacing: 3px;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 10px;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%; background: transparent;
+      border: none; border-bottom: 1px solid rgba(201,169,110,0.2);
+      padding: 12px 0; color: var(--text); font-family: inherit;
+      font-size: 14px; outline: none; transition: border-color 0.3s;
+      -webkit-appearance: none;
+    }
+    .form-group select { cursor: pointer; }
+    .form-group select option { background: var(--dark); }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus { border-bottom-color: var(--gold); }
+    .form-group textarea { resize: vertical; min-height: 100px; }
+    .form-submit {
+      padding: 16px 56px;
+      background: var(--gold); color: var(--black);
+      border: none; cursor: pointer;
+      font-family: inherit; font-size: 10px;
+      letter-spacing: 4px; text-transform: uppercase; font-weight: 500;
+      transition: all 0.3s;
+    }
+    .form-submit:hover { background: var(--gold-light); }
+    .form-note { font-size: 11px; color: var(--muted); margin-top: 16px; line-height: 1.8; }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: var(--dark);
+      border-top: 1px solid rgba(201,169,110,0.1);
+      padding: 60px;
+    }
+    .footer-inner {
+      max-width: 1200px; margin: 0 auto;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .footer-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 24px; font-weight: 300; letter-spacing: 8px; color: var(--gold);
+    }
+    .footer-links { display: flex; gap: 32px; list-style: none; }
+    .footer-links a {
+      color: var(--muted); text-decoration: none;
+      font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+      transition: color 0.3s;
+    }
+    .footer-links a:hover { color: var(--gold); }
+    .footer-copy { font-size: 11px; color: var(--muted); }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 900px) {
+      nav { padding: 20px 24px; }
+      .nav-links { display: none; }
+      section { padding: 80px 24px; }
+      .story-inner, .contact-inner { grid-template-columns: 1fr; gap: 48px; }
+      .story-visual { aspect-ratio: 4/3; }
+      .services-top { grid-template-columns: 1fr; gap: 40px; }
+      .services-grid { grid-template-columns: 1fr; }
+      .collection-grid { grid-template-columns: 1fr 1fr; }
+      .collection-item.featured { grid-row: unset; }
+      .portfolio-grid { grid-template-columns: 1fr; }
+      .pricing-grid { grid-template-columns: 1fr; }
+      .footer-inner { flex-direction: column; gap: 32px; text-align: center; }
+      .footer-links { flex-wrap: wrap; justify-content: center; }
+      .stats { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a href="#hero" class="nav-logo">SON</a>
+  <ul class="nav-links">
+    <li><a href="#story">브랜드</a></li>
+    <li><a href="#collection">컬렉션</a></li>
+    <li><a href="#services">서비스</a></li>
+    <li><a href="#portfolio">포트폴리오</a></li>
+    <li><a href="#pricing">요금</a></li>
+  </ul>
+  <a href="#contact" class="nav-cta">문의하기</a>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-line"></div>
+  <div class="hero-line"></div>
+  <div class="hero-line"></div>
+  <div class="hero-content">
+    <p class="hero-eyebrow">Luxury Brand since 2024</p>
+    <h1 class="hero-title">SON</h1>
+    <p class="hero-subtitle">Excellence in Every Detail</p>
+    <p class="hero-desc">타협 없는 장인 정신과 현대적 감각이 조화를 이루는 프리미엄 라이프스타일 브랜드</p>
+    <div class="hero-btns">
+      <a href="#collection" class="btn-primary">컬렉션 보기</a>
+      <a href="#story" class="btn-outline">브랜드 스토리</a>
+    </div>
+  </div>
+  <div class="hero-scroll">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- BRAND STORY -->
+<section id="story">
+  <div class="story-inner">
+    <div class="story-visual"></div>
+    <div class="story-text">
+      <p class="section-eyebrow">Brand Story</p>
+      <h2 class="section-title">불변의 아름다움을<br>추구합니다</h2>
+      <div class="gold-divider"></div>
+      <p class="section-text">
+        SON은 최고의 소재와 정교한 장인 정신으로 탄생한 프리미엄 럭셔리 브랜드입니다.
+        모든 제품과 서비스에는 우리만의 철학이 담겨 있습니다 — 진정한 아름다움은
+        세월이 흘러도 변하지 않는다는 것.
+      </p>
+      <br>
+      <p class="section-text">
+        글로벌 트렌드를 선도하면서도 한국의 전통적인 미감을 현대적으로 재해석하여,
+        세계 무대에서 인정받는 명품 브랜드를 만들어 나가고 있습니다.
+      </p>
+      <div class="stats">
+        <div>
+          <div class="stat-num">10+</div>
+          <div class="stat-label">Years of Craft</div>
+        </div>
+        <div>
+          <div class="stat-num">500+</div>
+          <div class="stat-label">Elite Clients</div>
+        </div>
+        <div>
+          <div class="stat-num">30+</div>
+          <div class="stat-label">Global Awards</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COLLECTION -->
+<section id="collection">
+  <div class="collection-header">
+    <p class="section-eyebrow">Collection</p>
+    <h2 class="section-title">2024 컬렉션</h2>
+    <p class="section-text">엄선된 소재와 탁월한 장인 정신으로 완성된 시그니처 컬렉션</p>
+  </div>
+  <div class="collection-grid">
+    <div class="collection-item featured" style="background: linear-gradient(160deg,#1a1a1a,#252017);">
+      <div class="item-bg" style="background:linear-gradient(160deg,#1a1a1a,#252017);"></div>
+      <div class="item-icon">◆</div>
+      <div class="item-label">
+        <div class="item-tag">Signature</div>
+        <div class="item-name">The Noir Series</div>
+        <div class="item-price">₩ 2,800,000 ~</div>
+      </div>
+    </div>
+    <div class="collection-item" style="background:linear-gradient(135deg,#1c1810,#252015);">
+      <div class="item-bg" style="background:linear-gradient(135deg,#1c1810,#252015);"></div>
+      <div class="item-icon">✦</div>
+      <div class="item-label">
+        <div class="item-tag">Heritage</div>
+        <div class="item-name">Gold Edition</div>
+        <div class="item-price">₩ 1,950,000 ~</div>
+      </div>
+    </div>
+    <div class="collection-item" style="background:linear-gradient(135deg,#141414,#1e1e1e);">
+      <div class="item-bg" style="background:linear-gradient(135deg,#141414,#1e1e1e);"></div>
+      <div class="item-icon">❧</div>
+      <div class="item-label">
+        <div class="item-tag">Limited</div>
+        <div class="item-name">Monogram</div>
+        <div class="item-price">₩ 3,500,000 ~</div>
+      </div>
+    </div>
+    <div class="collection-item" style="background:linear-gradient(135deg,#181818,#222222);">
+      <div class="item-bg" style="background:linear-gradient(135deg,#181818,#222222);"></div>
+      <div class="item-icon">◇</div>
+      <div class="item-label">
+        <div class="item-tag">Classic</div>
+        <div class="item-name">Essential</div>
+        <div class="item-price">₩ 980,000 ~</div>
+      </div>
+    </div>
+    <div class="collection-item" style="background:linear-gradient(135deg,#151210,#201e1a);">
+      <div class="item-bg" style="background:linear-gradient(135deg,#151210,#201e1a);"></div>
+      <div class="item-icon">♦</div>
+      <div class="item-label">
+        <div class="item-tag">Premium</div>
+        <div class="item-name">Bespoke</div>
+        <div class="item-price">₩ 문의</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="services-inner">
+    <div class="services-top">
+      <div>
+        <p class="section-eyebrow">Our Services</p>
+        <h2 class="section-title">프리미엄<br>서비스</h2>
+        <div class="gold-divider"></div>
+      </div>
+      <p class="section-text">
+        SON은 단순한 제품 판매를 넘어, 고객 한 분 한 분을 위한 맞춤형 럭셔리 경험을 제공합니다.
+        처음 상담부터 구매 후 케어까지, 모든 단계에서 최고의 서비스를 경험하세요.
+      </p>
+    </div>
+    <div class="services-grid">
+      <div class="service-card">
+        <div class="service-num">01</div>
+        <div class="service-name">Private Consultation</div>
+        <p class="service-desc">전담 컨설턴트와의 1:1 프라이빗 상담으로 고객의 라이프스타일에 완벽히 맞는 제품을 추천해 드립니다.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-num">02</div>
+        <div class="service-name">Bespoke Customization</div>
+        <p class="service-desc">모노그램, 특수 소재, 특별 색상 등 고객만의 유일한 맞춤 제작 서비스를 제공합니다.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-num">03</div>
+        <div class="service-name">White Glove Delivery</div>
+        <p class="service-desc">전문 케어 팀이 직접 방문하여 안전하게 제품을 전달하고 초기 케어 방법을 안내해 드립니다.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-num">04</div>
+        <div class="service-name">Lifetime Care Program</div>
+        <p class="service-desc">구매 후에도 평생 관리 프로그램을 통해 제품의 가치를 오래도록 유지할 수 있도록 지원합니다.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-num">05</div>
+        <div class="service-name">VIP Event Access</div>
+        <p class="service-desc">신상품 런칭, 프라이빗 쇼룸 오픈, 해외 컬렉션 투어 등 특별 이벤트에 우선 초대됩니다.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-num">06</div>
+        <div class="service-name">Investment Advisory</div>
+        <p class="service-desc">명품의 자산 가치를 극대화할 수 있도록 컬렉션 구성과 희소 아이템 투자에 대한 전문 조언을 제공합니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PORTFOLIO -->
+<section id="portfolio">
+  <div class="portfolio-inner">
+    <div class="portfolio-header">
+      <div>
+        <p class="section-eyebrow">Portfolio</p>
+        <h2 class="section-title">주요 실적</h2>
+      </div>
+      <div class="gold-divider" style="margin:0;"></div>
+    </div>
+    <div class="portfolio-grid">
+      <div class="portfolio-item">
+        <div class="portfolio-year">2024 — Seoul</div>
+        <div class="portfolio-title">파리 꼬르동 블루 컬래버레이션 컬렉션</div>
+        <p class="section-text" style="font-size:13px;">세계적인 요리 학교와의 협업으로 탄생한 한정판 프리미엄 라인. 출시 48시간 만에 완판을 기록했습니다.</p>
+        <div class="portfolio-tags">
+          <span class="tag">Collaboration</span>
+          <span class="tag">Limited Edition</span>
+          <span class="tag">Sold Out</span>
+        </div>
+      </div>
+      <div class="portfolio-item">
+        <div class="portfolio-year">2024 — Paris</div>
+        <div class="portfolio-title">파리 럭셔리 엑스포 2024 참가</div>
+        <p class="section-text" style="font-size:13px;">세계 3대 럭셔리 전시회 중 하나인 파리 엑스포에서 한국 브랜드 최초로 메인 홀 부스를 운영했습니다.</p>
+        <div class="portfolio-tags">
+          <span class="tag">Global</span>
+          <span class="tag">Exhibition</span>
+        </div>
+      </div>
+      <div class="portfolio-item">
+        <div class="portfolio-year">2023 — Milan</div>
+        <div class="portfolio-title">밀라노 패션위크 공식 파트너 선정</div>
+        <p class="section-text" style="font-size:13px;">밀라노 패션위크 공식 파트너 브랜드로 선정되어 글로벌 럭셔리 시장에서의 위상을 높였습니다.</p>
+        <div class="portfolio-tags">
+          <span class="tag">Fashion Week</span>
+          <span class="tag">Official Partner</span>
+        </div>
+      </div>
+      <div class="portfolio-item">
+        <div class="portfolio-year">2023 — Seoul</div>
+        <div class="portfolio-title">Korea Luxury Award 2023 수상</div>
+        <p class="section-text" style="font-size:13px;">국내 최권위 럭셔리 어워드에서 '올해의 신흥 럭셔리 브랜드' 부문을 수상하며 품질과 혁신성을 인정받았습니다.</p>
+        <div class="portfolio-tags">
+          <span class="tag">Award</span>
+          <span class="tag">Best Brand</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="pricing-inner">
+    <div class="pricing-header">
+      <p class="section-eyebrow">Membership</p>
+      <h2 class="section-title">멤버십 플랜</h2>
+      <div class="gold-divider" style="margin:24px auto;"></div>
+      <p class="section-text">고객의 니즈에 맞는 전용 멤버십으로 SON의 모든 혜택을 누리세요</p>
+    </div>
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <div class="plan-tier">Silver</div>
+        <div class="plan-price"><span>₩ </span>150,000</div>
+        <div class="plan-desc">/ 월 기준</div>
+        <ul class="plan-features">
+          <li>신제품 사전 알림</li>
+          <li>연 2회 케어 서비스</li>
+          <li>멤버 전용 할인 5%</li>
+          <li>전용 고객 상담 라인</li>
+        </ul>
+        <a href="#contact" class="plan-btn">시작하기</a>
+      </div>
+      <div class="pricing-card featured">
+        <div class="plan-tier">Gold</div>
+        <div class="plan-price"><span>₩ </span>380,000</div>
+        <div class="plan-desc">/ 월 기준</div>
+        <ul class="plan-features">
+          <li>Silver 전체 혜택 포함</li>
+          <li>1:1 프라이빗 컨설팅</li>
+          <li>VIP 이벤트 우선 초대</li>
+          <li>멤버 전용 할인 12%</li>
+          <li>연 4회 케어 서비스</li>
+          <li>화이트 글러브 딜리버리</li>
+        </ul>
+        <a href="#contact" class="plan-btn">시작하기</a>
+      </div>
+      <div class="pricing-card">
+        <div class="plan-tier">Platinum</div>
+        <div class="plan-price" style="font-size:36px;padding-top:8px;">맞춤 견적</div>
+        <div class="plan-desc">개인화된 서비스</div>
+        <ul class="plan-features">
+          <li>Gold 전체 혜택 포함</li>
+          <li>전담 퍼스널 쇼퍼</li>
+          <li>해외 쇼룸 투어</li>
+          <li>맞춤 제작 무제한</li>
+          <li>명품 자산 투자 어드바이저리</li>
+          <li>연중무휴 24시간 지원</li>
+        </ul>
+        <a href="#contact" class="plan-btn">상담 문의</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-inner">
+    <div class="contact-info">
+      <p class="section-eyebrow">Contact</p>
+      <h2 class="section-title">함께<br>시작하세요</h2>
+      <div class="gold-divider"></div>
+      <p class="section-text">SON의 전문 컨설턴트가 최적의 솔루션을 제안해 드립니다.</p>
+      <br><br>
+      <div class="contact-detail">
+        <div class="contact-label">Website</div>
+        <div class="contact-value">son.ai.kr</div>
+      </div>
+      <div class="contact-detail">
+        <div class="contact-label">Email</div>
+        <div class="contact-value">contact@son.ai.kr</div>
+      </div>
+      <div class="contact-detail">
+        <div class="contact-label">Showroom</div>
+        <div class="contact-value">서울특별시 강남구<br>By appointment only</div>
+      </div>
+      <div class="contact-detail">
+        <div class="contact-label">Hours</div>
+        <div class="contact-value">월 – 금: 10:00 – 19:00<br>토: 11:00 – 17:00</div>
+      </div>
+    </div>
+    <div class="contact-form">
+      <form onsubmit="handleSubmit(event)">
+        <div class="form-group">
+          <label>성함</label>
+          <input type="text" placeholder="홍길동" required />
+        </div>
+        <div class="form-group">
+          <label>이메일</label>
+          <input type="email" placeholder="email@example.com" required />
+        </div>
+        <div class="form-group">
+          <label>연락처</label>
+          <input type="tel" placeholder="010-0000-0000" />
+        </div>
+        <div class="form-group">
+          <label>문의 유형</label>
+          <select>
+            <option value="">선택해 주세요</option>
+            <option>제품 구매 상담</option>
+            <option>맞춤 제작 문의</option>
+            <option>멤버십 가입</option>
+            <option>기업/단체 문의</option>
+            <option>기타</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>문의 내용</label>
+          <textarea placeholder="문의 내용을 자유롭게 작성해 주세요."></textarea>
+        </div>
+        <button type="submit" class="form-submit">문의 보내기</button>
+        <p class="form-note">※ 영업일 기준 1–2일 내 답변 드립니다.<br>긴급 문의는 이메일로 연락 주세요.</p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">SON</div>
+    <ul class="footer-links">
+      <li><a href="#story">브랜드</a></li>
+      <li><a href="#collection">컬렉션</a></li>
+      <li><a href="#services">서비스</a></li>
+      <li><a href="#portfolio">포트폴리오</a></li>
+      <li><a href="#pricing">멤버십</a></li>
+      <li><a href="#contact">문의</a></li>
+    </ul>
+    <div class="footer-copy">© 2024 SON Luxury Brand. All rights reserved.</div>
+  </div>
+</footer>
+
+<script>
+  // Navbar scroll effect
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 60);
+  });
+
+  // Smooth scroll for anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', e => {
+      e.preventDefault();
+      const target = document.querySelector(anchor.getAttribute('href'));
+      if (target) target.scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+
+  // Form submit handler
+  function handleSubmit(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('.form-submit');
+    btn.textContent = '전송 완료 ✓';
+    btn.style.background = '#2a2a2a';
+    btn.style.color = 'var(--gold)';
+    btn.style.border = '1px solid var(--gold)';
+    btn.disabled = true;
+    setTimeout(() => {
+      btn.textContent = '문의 보내기';
+      btn.style.background = '';
+      btn.style.color = '';
+      btn.style.border = '';
+      btn.disabled = false;
+      e.target.reset();
+    }, 3000);
+  }
+
+  // Subtle entrance animation on scroll
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.service-card, .portfolio-item, .pricing-card, .collection-item').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(24px)';
+    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>
