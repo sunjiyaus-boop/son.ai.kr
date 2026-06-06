@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ko" data-hc="off">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>국제 장애인신문 — 듣기 페이지 (오늘 신문 전체 낭독)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet" />
+<style>
+  :root{ --scale:1.15;
+    --bg:#fbfaf6; --surface:#fff; --ink:#16140f; --muted:#5e584d;
+    --accent:#0b4aa2; --soft:#e7eefb; --line:#e0dace;
+    --serif:'Gowun Batang',serif; --sans:'Noto Sans KR',sans-serif; }
+  html[data-hc="on"]{ --bg:#000; --surface:#000; --ink:#fff; --muted:#ffe23d; --accent:#ffe23d; --soft:#1c1c00; --line:#fff; }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans); font-size:calc(1rem*var(--scale)); line-height:1.7;}
+  button{font-family:var(--sans); cursor:pointer;}
+  *:focus-visible{outline:5px solid var(--accent); outline-offset:3px; border-radius:6px;}
+  a{color:var(--accent); font-weight:700;}
+  .wrap{max-width:740px; margin:0 auto; padding:0 20px 90px;}
+  header{text-align:center; padding:28px 0 10px;}
+  header .date{font-size:.85em; letter-spacing:2px; color:var(--muted);}
+  header h1{font-family:var(--serif); font-size:2.1em; margin:6px 0 2px;}
+  header .sub{color:var(--accent); font-weight:700;}
+  .play{display:block; width:100%; margin:18px 0; padding:26px; border-radius:18px; border:4px solid var(--accent); background:var(--accent); color:var(--bg); font-size:1.55em; font-weight:900;}
+  html[data-hc="on"] .play{color:#000;}
+  .play.playing{background:var(--surface); color:var(--accent);}
+  .status{text-align:center; font-weight:700; color:var(--accent); min-height:1.4em; margin-bottom:8px;}
+  .controls{display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-bottom:8px;}
+  .controls .grp{display:flex; gap:8px; align-items:center; background:var(--surface); border:2px solid var(--line); border-radius:12px; padding:8px 12px;}
+  .controls .grp span{font-weight:700; color:var(--muted); font-size:.9em;}
+  .controls button{border:2px solid var(--accent); background:var(--surface); color:var(--accent); font-weight:700; border-radius:9px; padding:8px 14px; font-size:1em;}
+  .controls button[aria-pressed="true"]{background:var(--accent); color:var(--bg);}
+  html[data-hc="on"] .controls button[aria-pressed="true"]{color:#000;}
+  .note{text-align:center; color:var(--muted); font-size:.9em; margin:6px 0 22px;}
+  article{background:var(--surface); border:2px solid var(--line); border-radius:14px; padding:22px 24px; margin-bottom:16px;}
+  article.reading{border-color:var(--accent); box-shadow:0 0 0 4px var(--soft);}
+  article .cat{font-weight:700; color:var(--accent); font-size:.9em;}
+  article .reading-tag{font-weight:700; color:var(--accent); margin-left:8px;}
+  article h2{font-family:var(--serif); font-size:1.45em; line-height:1.3; margin:8px 0 10px;}
+  article p{font-size:1.1em; margin:0 0 10px;}
+  article .src{color:var(--muted); font-size:.88em;}
+  footer{text-align:center; margin-top:26px; color:var(--muted); font-size:.9em;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="date" id="today"></div>
+    <h1>국제 장애인신문 듣기</h1>
+    <div class="sub">오늘 신문을 처음부터 끝까지 읽어드립니다</div>
+  </header>
+  <button class="play" id="play" autofocus>▶ 오늘 신문 전체 듣기</button>
+  <p class="status" id="status" role="status" aria-live="polite"></p>
+  <div class="controls">
+    <div class="grp"><span>읽기 속도</span>
+      <button data-rate="0.8" aria-pressed="false">느리게</button>
+      <button data-rate="1" aria-pressed="true">보통</button>
+      <button data-rate="1.3" aria-pressed="false">빠르게</button></div>
+    <div class="grp"><span>글자</span>
+      <button data-scale="1.15" aria-pressed="true">보통</button>
+      <button data-scale="1.4" aria-pressed="false">크게</button>
+      <button id="hcBtn" aria-pressed="false">고대비</button></div>
+  </div>
+  <p class="note">※ 국제 장애인신문 앱에서는 열면 자동으로 읽기가 시작됩니다. (웹은 위 버튼을 한 번 눌러 주세요)</p>
+  <main id="paper" aria-label="오늘의 신문 본문"></main>
+  <footer><a href="index.html">← 신문 메인 화면으로</a></footer>
+</div>
+
+<script>
+const SAMPLE = {
+  articles: [
+    { id:"lead", category:"복지·장애", source:"장애인문화신문",
+      headline:"2026년 장애인 정책 확 바뀐다, 활동지원 늘고 개인예산제 전국 시행",
+      body:"올해부터 장애인 복지제도가 여러 갈래로 바뀝니다. 중증장애인의 월 활동지원 시간은 205시간에서 258시간으로 늘고, 시간당 단가도 오릅니다.\n시범사업이던 개인 예산제는 올해 전국에서 시행됩니다. 활동지원 급여의 일부를 현금처럼 받아 보조기기나 주거환경 개선에 직접 쓸 수 있습니다.\n장애인연금은 월 최대 43만 9,700원으로 오르고, 장애 인정 유형도 16개로 늘어 췌장장애가 새로 포함됩니다." },
+    { id:"politics", category:"정치", source:"선거 보도 종합",
+      headline:"6·3 지방선거 막 내려, 국회의원 14곳 재보궐 동시 실시",
+      body:"제8회 전국동시지방선거가 지난 6월 3일 전국에서 치러졌습니다.\n이번에는 국회의원 14곳의 재보궐선거가 함께 열렸습니다. 한꺼번에 비는 의석이 이만큼 많은 것은 민주화 이후 처음입니다.\n각 정당은 이번 선거를 앞으로의 정국을 가늠하는 잣대로 보고 있습니다." },
+    { id:"iran", category:"국제", source:"NPR",
+      headline:"중동 긴장 고조, 호르무즈 해협 물류 사실상 멈춰",
+      body:"이란을 둘러싼 무력 충돌이 이어지면서 중동의 긴장이 높아지고 있습니다.\n세계 원유 수송의 길목인 호르무즈 해협의 선박 운항이 사실상 멈추면서, 기업들은 대체 경로를 찾느라 분주합니다.\n물류 차질이 길어지면 국제 유가와 물가에 영향을 줄 수 있다는 우려가 나옵니다." },
+    { id:"col", category:"사설",
+      headline:"국제 장애인신문이 첫 호를 냅니다",
+      body:"정보는 모두의 권리입니다. 그러나 작은 글씨와 복잡한 문장, 소리 없는 화면은 누군가에게 여전히 높은 벽입니다.\n국제 장애인신문은 장애 관련 소식뿐 아니라 사회와 세계에서 일어나는 일을 모두 다룹니다. 장애인도 세상 전체를 알 권리가 있기 때문입니다.\n모든 뉴스를 쉬운 말로 다시 쓰고, 큰 글씨로 보여 주며, 소리 내어 읽어 드립니다." },
+    { id:"subway", category:"사회", source:"보안뉴스",
+      headline:"버튼 안 눌러도 열린다, 휠체어 자동 인식 엘리베이터",
+      body:"휠체어나 전동스쿠터를 탄 교통약자가 버튼을 누르지 않아도, 카메라가 이를 알아보고 엘리베이터를 자동으로 불러 주는 기술이 서울 지하철에 도입됐습니다.\n좁은 경사로에서 버튼을 누르기 어렵다는 민원에서 시작된 개선입니다.\n작은 기술 하나가 이동의 문턱을 낮춘 사례로 꼽힙니다." },
+    { id:"econ2", category:"경제", source:"재정경제부",
+      headline:"5월 물가 발표와 OECD 전망, 유가 불안에 촉각",
+      body:"정부가 5월 소비자물가 동향을 발표했고, 경제협력개발기구 OECD도 6월 세계 경제전망을 내놨습니다.\n다만 중동 정세로 인한 국제 유가 불안이 새로운 변수로 떠올랐습니다.\n유가가 흔들리면 장바구니 물가에도 영향을 줄 수 있어 당국이 상황을 주시하고 있습니다." },
+    { id:"stat", category:"복지·장애", source:"보건복지부",
+      headline:"등록장애인 262만 명 시대, 10명 중 6명이 65세 이상",
+      body:"지난해 말 기준 등록장애인은 262만 7천여 명으로, 전체 인구의 5.1% 수준입니다.\n유형별로는 지체장애가 가장 많았고, 청각장애와 시각장애가 뒤를 이었습니다.\n특히 65세 이상 고령 장애인이 전체의 56.9%에 달해, 고령화 흐름이 뚜렷합니다." },
+    { id:"eu", category:"국제", source:"유엔지역정보센터",
+      headline:"유럽, AI도 차별 없이. 올해 8월 AI법 본격 적용",
+      body:"세계 최초의 포괄적 인공지능 규제인 유럽연합 AI법의 핵심 조항이 올해 8월부터 본격 적용됩니다.\n이 법은 채용이나 복지 판정에 쓰이는 AI가 장애인을 차별하거나 사생활을 침해하지 않도록 막는 데 초점을 둡니다.\n유엔은 전 세계 장애인의 구매력을 연 8조 달러로 추산하며 접근 가능한 기술의 중요성을 강조해 왔습니다." },
+    { id:"culture", category:"문화", source:"머니투데이방송",
+      headline:"자막 안경 쓰고 보는 공연, 넓어지는 배리어프리 무대",
+      body:"대사를 실시간으로 안경 렌즈에 띄워 주는 자막 안경, 수어 통역과 음성 해설을 갖춘 공연이 점차 늘고 있습니다.\n영화에서도 화면을 설명하는 음성과 자막을 넣은 배리어프리 영화 상영이 이어집니다.\n다만 추가 인력과 장비를 감당할 재원이 부족하다는 목소리도 함께 나옵니다." },
+    { id:"budget", category:"경제", source:"배리어프리뉴스",
+      headline:"올해 복지와 고용 예산 확대, 장애인 고용장려금도 증액",
+      body:"올해 보건복지부 총지출은 137조 원대로 지난해보다 9.7% 늘었습니다.\n장애인 고용을 늘리기 위한 고용장려금은 4,014억 원으로, 지난해보다 293억 원 늘었습니다.\n장애인의 소득과 일자리를 함께 떠받치려는 취지입니다." },
+    { id:"tech", category:"국제", source:"레벨액세스",
+      headline:"사진을 읽어주는 AI, 시각장애인의 일상을 바꾸다",
+      body:"카메라로 주변을 비추면 장면을 설명하고 글자를 소리 내어 읽어 주는 AI 보조 기술이 빠르게 발전하고 있습니다.\n시각장애인을 위한 무료 앱들이 사물 인식과 글자 읽기, 장면 설명 기능을 제공합니다.\n전문가들은 이런 기술이 더 정확하고 개인 맞춤형으로 진화하고 있다고 봅니다." },
+    { id:"job", category:"복지·장애", source:"보건복지부",
+      headline:"올해 장애인 일자리 3만 5천여 개, 2,300개 늘어",
+      body:"정부가 올해 장애인 공공일자리를 지난해보다 2,300개 늘려 3만 5,846명 규모로 운영합니다.\n일자리는 일반형, 복지형, 시각장애인 안마사 파견 같은 특화형으로 나뉩니다.\n참여자 모집은 지방자치단체별로 진행됩니다." },
+    { id:"peru", category:"국제", source:"AP·유로뉴스",
+      headline:"페루, 곧 새 대통령 뽑는다. 좌우 팽팽한 접전",
+      body:"페루가 곧 새 대통령을 뽑는 선거를 치릅니다.\n여론조사는 강경 우파 후보와 좌파 후보가 팽팽히 맞서는 접전을 가리키고 있습니다.\n중남미 정치 지형에 영향을 줄 선거로 국제사회가 주목하고 있습니다." },
+    { id:"reader", category:"독자 기사", author:"독자기자 ○○○",
+      headline:"우리 동네에 생긴 작은 변화",
+      body:"집 앞 버스 정류장에 음성 안내가 새로 생겼습니다.\n버스 번호를 소리로 알려 주어 한결 마음이 놓입니다.\n작은 변화지만 하루가 편해졌습니다." }
+  ],
+  ad: { id:"ad1", advertiser:"한울복지재단", text:"한울복지재단이 함께합니다. 장애인 활동지원 신청, 가까운 주민센터에서 도와드립니다." }
+};
+
+let EDITION = SAMPLE, rate = 1;
+let segs = [], idx = 0, playingAll = false;
+const synthOK = 'speechSynthesis' in window;
+function splitSentences(t){ return (t||"").split(/\n+/).flatMap(l=>l.match(/[^.!?。…]+[.!?。…]?/g)||[]).map(s=>s.trim()).filter(Boolean); }
+function render(){
+  document.getElementById("today").textContent = new Date().toLocaleDateString("ko-KR",{year:"numeric",month:"long",day:"numeric",weekday:"long"});
+  const p = document.getElementById("paper"); p.innerHTML = "";
+  EDITION.articles.forEach(a=>{
+    const el = document.createElement("article"); el.dataset.aid=a.id;
+    el.innerHTML = `<span class="cat">${a.category}</span><span class="reading-tag" hidden>🔊 지금 읽는 중</span>
+      <h2>${a.headline}</h2>${a.body.split("\n").map(x=>`<p>${x}</p>`).join("")}
+      <div class="src">${a.source?("출처: "+a.source):(a.author||"")}</div>`;
+    p.appendChild(el);
+  });
+  if (EDITION.ad){
+    const el = document.createElement("article"); el.dataset.aid=EDITION.ad.id;
+    el.innerHTML = `<span class="cat">광고</span><span class="reading-tag" hidden>🔊 지금 읽는 중</span>
+      <p style="font-size:1.1em">${EDITION.ad.text}</p><div class="src">${EDITION.ad.advertiser}</div>`;
+    p.appendChild(el);
+  }
+}
+function highlight(aid){
+  document.querySelectorAll("article").forEach(el=>{
+    const on = el.dataset.aid===aid; el.classList.toggle("reading", on);
+    const tag = el.querySelector(".reading-tag"); if(tag) tag.hidden = !on;
+    if (on) el.scrollIntoView({behavior:"smooth", block:"center"});
+  });
+}
+function step(){
+  if (idx>=segs.length){ finish(); return; }
+  const {text,aid}=segs[idx]; highlight(aid);
+  const u=new SpeechSynthesisUtterance(text); u.lang="ko-KR"; u.rate=rate;
+  u.onend=()=>{idx++; step();}; u.onerror=()=>{idx++; step();};
+  speechSynthesis.speak(u);
+}
+function start(){
+  if (!synthOK){ document.getElementById("status").textContent="이 브라우저는 음성 읽기를 지원하지 않습니다."; return; }
+  const list = [
+    ...splitSentences("국제 장애인신문, 오늘자 신문입니다.").map(s=>({text:s,aid:"intro"})),
+    ...EDITION.articles.flatMap(a=>splitSentences(`${a.headline}. ${a.body}`).map(s=>({text:s,aid:a.id}))),
+    ...(EDITION.ad?splitSentences(`광고. ${EDITION.ad.text}`).map(s=>({text:s,aid:EDITION.ad.id})):[])
+  ];
+  speechSynthesis.cancel(); segs=list; idx=0; playingAll=true; update(); step();
+}
+function finish(){ playingAll=false; segs=[]; idx=0; highlight(null); update(); }
+function stop(){ if(synthOK) speechSynthesis.cancel(); finish(); }
+function update(){
+  const b=document.getElementById("play");
+  b.classList.toggle("playing", playingAll);
+  b.textContent = playingAll ? "◼ 멈춤" : "▶ 오늘 신문 전체 듣기";
+  document.getElementById("status").textContent = playingAll ? "🔊 읽는 중… 끝까지 자동으로 이어집니다" : "";
+}
+document.getElementById("play").onclick = ()=> playingAll ? stop() : start();
+document.querySelectorAll("[data-rate]").forEach(b=>b.onclick=()=>{ rate=parseFloat(b.dataset.rate); document.querySelectorAll("[data-rate]").forEach(x=>x.setAttribute("aria-pressed",x===b)); });
+document.querySelectorAll("[data-scale]").forEach(b=>b.onclick=()=>{ document.documentElement.style.setProperty("--scale", b.dataset.scale); document.querySelectorAll("[data-scale]").forEach(x=>x.setAttribute("aria-pressed",x===b)); });
+document.getElementById("hcBtn").onclick=function(){ const on=document.documentElement.getAttribute("data-hc")==="on"; document.documentElement.setAttribute("data-hc", on?"off":"on"); this.setAttribute("aria-pressed", String(!on)); };
+(async function(){ try{ const r=await fetch("./articles.json",{cache:"no-store"}); if(r.ok){const d=await r.json(); if(d&&d.articles) EDITION=d;} }catch(e){} render(); })();
+</script>
+</body>
+</html>
