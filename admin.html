@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex,nofollow" />
+<title>기사 올리기 · 국제 장애인신문 관리자</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="./supabase-config.js"></script>
+<style>
+  :root{--primary:#0a3a8c;--accent:#b0122a;--line:#c9cfd8;--panel:#f4f6f9;--ink:#111418;--muted:#3f4652;--ok:#14532d;--okbg:#e4f3e8;--errbg:#fde8e8;--err:#7f1d1d;}
+  *{box-sizing:border-box}
+  body{margin:0;background:#fff;color:var(--ink);font-family:'Noto Sans KR',system-ui,sans-serif;font-size:20px;line-height:1.65;word-break:keep-all}
+  header{background:var(--primary);color:#fff;border-bottom:4px solid var(--ink)}
+  header .in{max-width:900px;margin:0 auto;padding:14px 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  header h1{font-size:1.15em;margin:0;font-weight:900}
+  header .sp{margin-left:auto;display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:.85em}
+  header a{color:#fff}
+  main{max-width:900px;margin:0 auto;padding:20px 16px 90px}
+  .card{background:#fff;border:2px solid var(--line);border-radius:16px;padding:20px;margin-bottom:20px}
+  h2{margin:0 0 6px;font-size:1.35em;font-weight:900}
+  label{display:block;font-weight:700;margin:18px 0 6px}
+  input[type=text],input[type=email],input[type=password],input[type=date],input[type=url],select,textarea{width:100%;font:inherit;padding:12px 14px;border:2px solid #6b7280;border-radius:10px;background:#fff;color:var(--ink)}
+  textarea{min-height:240px;resize:vertical}
+  textarea.short{min-height:96px}
+  button{font:inherit;font-weight:700;border-radius:12px;padding:12px 20px;cursor:pointer;min-height:54px;border:3px solid var(--primary);background:#fff;color:var(--primary)}
+  button.solid{background:var(--primary);color:#fff}
+  button.danger{border-color:var(--accent);color:var(--accent)}
+  button:disabled{opacity:.6;cursor:wait}
+  *:focus-visible{outline:5px solid #ffbf00;outline-offset:3px}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .grow{flex:1 1 260px}
+  .mic{padding:6px 14px;min-height:48px;font-size:.88em;border-width:2px}
+  .mic.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  .hint{color:var(--muted);font-size:.85em;margin:4px 0 0;font-weight:400}
+  .msg{padding:12px 14px;border-radius:10px;margin:14px 0 0;font-weight:700}
+  .msg.ok{background:var(--okbg);color:var(--ok)} .msg.err{background:var(--errbg);color:var(--err)}
+  .note{background:var(--panel);border-left:6px solid var(--primary);border-radius:0 10px 10px 0;padding:10px 14px;font-size:.88em;margin-top:10px}
+  .item{display:flex;gap:12px;align-items:center;border-top:2px solid var(--line);padding:14px 0;flex-wrap:wrap}
+  .item:first-child{border-top:none}
+  .item .t{flex:1 1 300px;font-weight:700}
+  .item .m{color:var(--muted);font-size:.8em;font-weight:400}
+  .tag{display:inline-block;background:#e7eefb;color:var(--primary);border-radius:999px;padding:0 10px;font-size:.75em;margin-right:6px;font-weight:900}
+  .tag.lead{background:var(--accent);color:#fff} .tag.off{background:#e5e7eb;color:#374151}
+  img.prev{display:block;max-width:100%;max-height:260px;border-radius:12px;margin-top:10px;border:2px solid var(--line)}
+  .hidden{display:none !important}
+  .chk{display:flex;gap:12px;align-items:center;margin-top:16px;font-weight:700}
+  .chk input{width:28px;height:28px}
+  .chk label{margin:0}
+  ol.steps{padding-left:1.3em} ol.steps li{margin:6px 0}
+  code{background:var(--panel);padding:1px 6px;border-radius:6px}
+</style>
+</head>
+<body>
+<header><div class="in">
+  <h1>🗞 국제 장애인신문 · 기사 올리기</h1>
+  <span class="sp"><a href="./" target="_blank" rel="noopener">홈페이지 보기 ↗</a><span id="who"></span><button class="hidden" id="logout" style="min-height:40px;padding:4px 14px;background:#fff">로그아웃</button></span>
+</div></header>
+
+<main>
+  <!-- 설정 안내 -->
+  <section id="setup" class="card hidden" aria-live="polite">
+    <h2>아직 연결 설정이 안 됐습니다</h2>
+    <p id="setupWhy">저장소의 <code>supabase-config.js</code> 파일에 Supabase 주소(url)와 공개 키(anonKey)를 넣어 주세요.</p>
+    <ol class="steps">
+      <li>Supabase에서 프로젝트를 만듭니다.</li>
+      <li>SQL Editor에 <code>supabase_setup.sql</code> 내용을 붙여 넣고 실행합니다. (관리자 이메일로 바꿔서)</li>
+      <li>Authentication → Users → Add user 로 관리자 계정을 만듭니다.</li>
+      <li>Project Settings → API 의 Project URL 과 anon public 키를 <code>supabase-config.js</code> 에 넣고 올립니다.</li>
+    </ol>
+  </section>
+
+  <!-- 로그인 -->
+  <section id="loginBox" class="card hidden">
+    <h2>관리자 로그인</h2>
+    <form id="loginForm">
+      <label for="email">이메일</label>
+      <input type="email" id="email" autocomplete="username" required />
+      <label for="pw">비밀번호</label>
+      <input type="password" id="pw" autocomplete="current-password" required />
+      <div class="row" style="margin-top:18px"><button class="solid" type="submit" id="loginBtn">로그인</button></div>
+    </form>
+    <div id="loginMsg" aria-live="polite"></div>
+  </section>
+
+  <!-- 작성 -->
+  <section id="editor" class="card hidden">
+    <h2 id="editorTitle">새 기사 쓰기</h2>
+    <p class="hint">🎤 '말하기'를 누르고 말하면 글자로 적힙니다. 한 번 더 누르면 멈춥니다. (크롬에서 마이크 허용 필요)</p>
+
+    <label for="category">분야</label>
+    <select id="category">
+      <option>복지·장애</option><option>사회</option><option>정치</option><option>국제</option>
+      <option>경제</option><option>문화</option><option>사설</option><option>독자 기사</option>
+    </select>
+
+    <label for="headline">제목 <span class="hint">(필수)</span></label>
+    <div class="row"><input type="text" id="headline" class="grow" maxlength="120" /><button class="mic" type="button" data-target="headline">🎤 말하기</button></div>
+
+    <label for="dek">한두 문장 요약</label>
+    <div class="row" style="align-items:stretch"><textarea id="dek" class="short grow" maxlength="300"></textarea><button class="mic" type="button" data-target="dek">🎤 말하기</button></div>
+
+    <label for="body">본문 <span class="hint">(필수 · 문단은 줄을 바꿔 나눕니다)</span></label>
+    <div class="row" style="align-items:stretch"><textarea id="body" class="grow"></textarea><button class="mic" type="button" data-target="body">🎤 말하기</button></div>
+    <div class="row" style="margin-top:10px">
+      <button type="button" id="newPara">↵ 새 문단</button>
+      <button type="button" id="speakPreview">🔊 소리로 확인</button>
+      <button type="button" id="stopSpeak">◼ 멈춤</button>
+    </div>
+
+    <label for="author">기자 이름</label>
+    <input type="text" id="author" placeholder="예: 유선경 기자" />
+
+    <label for="source">참고한 언론사 <span class="hint">(직접 취재했으면 비워 두세요)</span></label>
+    <input type="text" id="source" />
+    <label for="sourceUrl">참고한 기사 주소 <span class="hint">(선택)</span></label>
+    <input type="url" id="sourceUrl" placeholder="https://" />
+
+    <label for="photo">사진 <span class="hint">(선택)</span></label>
+    <input type="file" id="photo" accept="image/jpeg,image/png,image/webp" />
+    <div class="note">직접 찍은 사진이나 사용 허락을 받은 사진만 올려 주세요. 다른 언론사 기사 사진은 쓰지 않습니다. 얼굴이 나온 사람이 있으면 동의를 받아 주세요.</div>
+    <img id="prev" class="prev hidden" alt="올릴 사진 미리보기" />
+    <button type="button" id="removePhoto" class="danger hidden" style="margin-top:10px">사진 빼기</button>
+    <label for="imageAlt">사진 설명 <span class="hint">(눈이 불편한 독자에게 읽어 줄 설명 · 예: 휠체어를 탄 시민이 버스에 오르는 모습)</span></label>
+    <input type="text" id="imageAlt" />
+    <label for="credit">사진 출처 <span class="hint">(예: 사진: 유선경 기자 / 사진: 홍길동 제공)</span></label>
+    <input type="text" id="credit" />
+
+    <label for="date">신문 날짜 <span class="hint">(이 날짜의 신문에 함께 나옵니다)</span></label>
+    <input type="date" id="date" />
+
+    <div class="chk"><input type="checkbox" id="isLead" /><label for="isLead">머리기사(맨 위)로 올리기</label></div>
+    <div class="chk"><input type="checkbox" id="published" checked /><label for="published">바로 공개하기 <span class="hint">(끄면 임시저장 · 홈페이지에 안 나옴)</span></label></div>
+
+    <div class="row" style="margin-top:22px">
+      <button class="solid" type="button" id="save">✔ 저장하고 올리기</button>
+      <button type="button" id="reset">새로 쓰기</button>
+    </div>
+    <div id="saveMsg" aria-live="polite"></div>
+  </section>
+
+  <!-- 목록 -->
+  <section id="listBox" class="card hidden">
+    <h2>올린 기사 <span class="hint">(최근 50건)</span></h2>
+    <div id="list"></div>
+  </section>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+const show = (id,on=true)=>$(id).classList.toggle("hidden",!on);
+const esc = s => String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const msg = (id,text,ok=true)=>{ $(id).innerHTML = text?`<div class="msg ${ok?'ok':'err'}">${text}</div>`:""; };
+const todayKST = ()=> new Date(Date.now()+9*3600*1000).toISOString().slice(0,10);
+
+/* ---------- 설정 확인 ---------- */
+const CFG = window.IDN_SUPABASE || {};
+function keyRole(k){ try{ return JSON.parse(atob(k.split(".")[1].replace(/-/g,"+").replace(/_/g,"/"))).role; }catch(e){ return ""; } }
+if(!window.supabase){ show("setup"); $("setupWhy").textContent="Supabase 프로그램을 불러오지 못했습니다. 인터넷 연결을 확인하고 새로고침해 주세요."; throw new Error("lib"); }
+if(!CFG.url || !CFG.anonKey){ show("setup"); throw new Error("config"); }
+if(keyRole(CFG.anonKey)==="service_role"){ show("setup"); $("setupWhy").innerHTML="<b>위험:</b> supabase-config.js 에 비밀 키(service_role)가 들어가 있습니다. 즉시 지우고 anon public 키로 바꿔 주세요."; throw new Error("svc"); }
+const sb = supabase.createClient(CFG.url, CFG.anonKey);
+let editingId=null, photoBlob=null, existingImage="";
+
+/* ---------- 로그인 ---------- */
+async function refresh(){
+  const { data:{ session } } = await sb.auth.getSession();
+  const on = !!session;
+  show("loginBox",!on); show("editor",on); show("listBox",on); show("logout",on);
+  $("who").textContent = on ? session.user.email : "";
+  if(on){ if(!$("date").value) $("date").value=todayKST(); loadList(); }
+}
+$("loginForm").onsubmit = async e=>{
+  e.preventDefault(); msg("loginMsg","");
+  $("loginBtn").disabled=true;
+  const { error } = await sb.auth.signInWithPassword({ email:$("email").value.trim(), password:$("pw").value });
+  $("loginBtn").disabled=false; $("pw").value="";
+  if(error){ msg("loginMsg","로그인하지 못했습니다. 이메일과 비밀번호를 확인해 주세요.",false); return; }
+  refresh();
+};
+$("logout").onclick = async ()=>{ await sb.auth.signOut(); refresh(); };
+
+/* ---------- 음성 입력 ---------- */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec=null, recBtn=null;
+function stopRec(){ const r=rec; rec=null; if(r){ try{r.stop();}catch(e){} } if(recBtn){ recBtn.classList.remove("on"); recBtn.textContent="🎤 말하기"; } recBtn=null; }
+document.querySelectorAll(".mic").forEach(btn=>{
+  btn.onclick = ()=>{
+    if(!SR){ alert("이 브라우저는 음성 입력을 지원하지 않습니다. 크롬을 사용해 주세요."); return; }
+    if(recBtn===btn){ stopRec(); return; }
+    stopRec();
+    const field=$(btn.dataset.target);
+    const r=new SR(); r.lang="ko-KR"; r.continuous=true; r.interimResults=false;
+    r.onresult=e=>{ for(let i=e.resultIndex;i<e.results.length;i++){ if(e.results[i].isFinal){
+      const t=e.results[i][0].transcript.trim(); const sep=field.value && !/[\s\n]$/.test(field.value) ? " " : ""; field.value+=sep+t; } } };
+    r.onend=()=>{ if(rec===r){ try{ r.start(); }catch(e){ stopRec(); } } };
+    r.onerror=ev=>{ if(ev.error==="not-allowed"){ alert("마이크 사용을 허용해 주세요."); stopRec(); } };
+    rec=r; recBtn=btn; btn.classList.add("on"); btn.textContent="■ 듣는 중 (눌러서 멈춤)";
+    try{ r.start(); }catch(e){}
+  };
+});
+$("newPara").onclick=()=>{ const b=$("body"); b.value=b.value.replace(/\s+$/,"")+"\n"; b.focus(); };
+
+/* ---------- 소리로 확인 ---------- */
+$("speakPreview").onclick=()=>{
+  if(!("speechSynthesis" in window)) return alert("소리 읽기를 지원하지 않는 브라우저입니다.");
+  speechSynthesis.cancel();
+  [$("headline").value, ...($("body").value||$("dek").value).split(/\n+/)].filter(Boolean)
+    .forEach(p=>{ const u=new SpeechSynthesisUtterance(p); u.lang="ko-KR"; speechSynthesis.speak(u); });
+};
+$("stopSpeak").onclick=()=>{ if("speechSynthesis" in window) speechSynthesis.cancel(); };
+
+/* ---------- 사진 (긴 변 1600px로 줄여서 올림) ---------- */
+async function shrink(file){
+  try{
+    const bmp = await createImageBitmap(file);
+    const s = Math.min(1, 1600/Math.max(bmp.width,bmp.height));
+    const c = document.createElement("canvas"); c.width=Math.round(bmp.width*s); c.height=Math.round(bmp.height*s);
+    c.getContext("2d").drawImage(bmp,0,0,c.width,c.height);
+    return await new Promise(r=>c.toBlob(b=>r(b||file),"image/jpeg",0.85));
+  }catch(e){ return file; }
+}
+$("photo").onchange=async e=>{
+  const f=e.target.files[0];
+  if(!f){ return; }
+  if(f.size>20*1024*1024){ alert("사진이 너무 큽니다(20MB 넘음)."); $("photo").value=""; return; }
+  photoBlob = await shrink(f);
+  $("prev").src=URL.createObjectURL(photoBlob); show("prev"); show("removePhoto");
+};
+$("removePhoto").onclick=()=>{ photoBlob=null; existingImage=""; $("photo").value=""; show("prev",false); show("removePhoto",false); };
+async function uploadPhoto(){
+  if(!photoBlob) return existingImage;
+  const path=`${todayKST()}/${Date.now()}.jpg`;
+  const { error } = await sb.storage.from("article-images").upload(path, photoBlob, { upsert:false, contentType:"image/jpeg" });
+  if(error) throw error;
+  return sb.storage.from("article-images").getPublicUrl(path).data.publicUrl;
+}
+
+/* ---------- 저장 ---------- */
+function formReset(){
+  stopRec(); editingId=null; photoBlob=null; existingImage="";
+  ["headline","dek","body","author","source","sourceUrl","credit","imageAlt"].forEach(i=>$(i).value="");
+  $("photo").value=""; show("prev",false); show("removePhoto",false);
+  $("isLead").checked=false; $("published").checked=true; $("date").value=todayKST(); $("category").selectedIndex=0;
+  $("editorTitle").textContent="새 기사 쓰기";
+}
+$("reset").onclick=()=>{ formReset(); msg("saveMsg",""); };
+$("save").onclick=async ()=>{
+  stopRec(); msg("saveMsg","");
+  if(!$("headline").value.trim() || !$("body").value.trim()){ msg("saveMsg","제목과 본문을 꼭 써 주세요.",false); return; }
+  const su=$("sourceUrl").value.trim();
+  if(su && !/^https?:\/\//.test(su)){ msg("saveMsg","참고한 기사 주소는 https:// 로 시작해야 합니다.",false); return; }
+  if((photoBlob||existingImage) && !$("imageAlt").value.trim()){ msg("saveMsg","사진 설명을 한 줄 적어 주세요. 눈이 불편한 독자에게 읽어 드립니다.",false); return; }
+  $("save").disabled=true; $("save").textContent="올리는 중…";
+  try{
+    const image_url = await uploadPhoto();
+    const row = {
+      category:$("category").value, headline:$("headline").value.trim(), dek:$("dek").value.trim(),
+      body:$("body").value.trim(), author:$("author").value.trim(), source:$("source").value.trim(),
+      source_url:su, image_url, image_credit:$("credit").value.trim(), image_alt:$("imageAlt").value.trim(),
+      publish_date:$("date").value||todayKST(), is_lead:$("isLead").checked, published:$("published").checked
+    };
+    const q = editingId ? sb.from("articles_manual").update(row).eq("id",editingId) : sb.from("articles_manual").insert(row);
+    const { error } = await q; if(error) throw error;
+    const isToday = row.publish_date===todayKST();
+    msg("saveMsg", !row.published ? "✔ 임시저장했습니다. (홈페이지에는 안 나옵니다)"
+      : isToday ? "✔ 올렸습니다. 홈페이지를 새로고침하면 바로 보입니다." : `✔ 올렸습니다. ${row.publish_date} 신문에 나옵니다.`);
+    formReset(); loadList();
+  }catch(err){ msg("saveMsg","저장하지 못했습니다: "+esc(err.message||err),false); }
+  $("save").disabled=false; $("save").textContent="✔ 저장하고 올리기";
+};
+
+/* ---------- 목록 · 수정 · 삭제 ---------- */
+let ROWS=[];
+async function loadList(){
+  const { data, error } = await sb.from("articles_manual").select("*").order("publish_date",{ascending:false}).order("created_at",{ascending:false}).limit(50);
+  if(error){ $("list").innerHTML=`<div class="msg err">${esc(error.message)}</div>`; return; }
+  ROWS=data||[];
+  $("list").innerHTML = ROWS.length ? ROWS.map(r=>`
+    <div class="item">
+      <div class="t">${r.is_lead?'<span class="tag lead">머리기사</span>':''}${r.published?'':'<span class="tag off">임시저장</span>'}<span class="tag">${esc(r.category)}</span>${esc(r.headline)}
+        <div class="m">${esc(r.publish_date)} 신문 · ${esc(r.author||"기자 이름 없음")}${r.image_url?' · 사진 있음':''}</div></div>
+      <button type="button" data-edit="${esc(r.id)}">수정</button>
+      <button type="button" class="danger" data-del="${esc(r.id)}">삭제</button>
+    </div>`).join("") : "<p>아직 올린 기사가 없습니다.</p>";
+}
+$("list").onclick=async e=>{
+  const ed=e.target.closest("[data-edit]"), del=e.target.closest("[data-del]");
+  if(ed){
+    const r=ROWS.find(x=>x.id===ed.dataset.edit); if(!r) return;
+    formReset(); editingId=r.id; existingImage=r.image_url||"";
+    $("category").value=r.category; $("headline").value=r.headline; $("dek").value=r.dek||""; $("body").value=r.body||"";
+    $("author").value=r.author||""; $("source").value=r.source||""; $("sourceUrl").value=r.source_url||"";
+    $("credit").value=r.image_credit||""; $("imageAlt").value=r.image_alt||""; $("date").value=r.publish_date;
+    $("isLead").checked=r.is_lead; $("published").checked=r.published;
+    if(existingImage){ $("prev").src=existingImage; show("prev"); show("removePhoto"); }
+    $("editorTitle").textContent="기사 고치기"; msg("saveMsg","");
+    window.scrollTo({top:0,behavior:"smooth"}); $("headline").focus({preventScroll:true});
+  }
+  if(del){
+    const r=ROWS.find(x=>x.id===del.dataset.del);
+    if(!confirm(`'${r?r.headline:""}' 기사를 지울까요? 되돌릴 수 없습니다.`)) return;
+    const { error } = await sb.from("articles_manual").delete().eq("id",del.dataset.del);
+    if(error) alert("지우지 못했습니다: "+error.message); else loadList();
+  }
+};
+
+sb.auth.onAuthStateChange(()=>refresh());
+refresh();
+</script>
+</body>
+</html>
